@@ -87,3 +87,54 @@ turn off the 2 by 2 grid
 dev.off()
 ```
 
+
+# Putting things together to communicate
+
+## model predictions
+
+```{r}
+# extract model predictions using ggpredict, terms correspond to the predictor in the model
+predictions <- ggpredict(maples_model, terms = "stem_length")
+
+predictions
+```
+
+plot predictions:
+
+```{r}
+plot_predictions <- ggplot(data = maples_data, aes(x = stem_length, y = stem_dry_mass))+ 
+  geom_point() +
+  geom_line(data = predictions, aes(x = x, y = predicted), 
+            color = "blue", linewidth = 1) +
+            geom_ribbon(data = predictions, aes(x = x, y = predicted,
+          ymin = conf.low,  ymax = conf.high), 
+              alpha = 0.2) 
+
+plot_predictions
+```
+
+
+## create a table
+
+```{r, model-summary-table}
+model_summary <- summary(maples_model)
+
+model_squares <- anova(maples_model)
+model_squares
+
+```
+
+
+# making a table
+
+```{r}
+model_squares_table <- tidy(model_squares) %>% 
+  mutate(p.value = case_when(
+    p.value < 0.001 ~ "< 0.001"
+  )) %>% 
+  flextable() %>% 
+  set_header_labels(df = "Degrees of Freedom", sumsq = "Sum of Squares")
+
+model_squares_table
+```
+
