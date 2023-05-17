@@ -121,6 +121,7 @@ model_summary <- summary(maples_model)
 
 model_squares <- anova(maples_model)
 model_squares
+model_summary
 
 ```
 
