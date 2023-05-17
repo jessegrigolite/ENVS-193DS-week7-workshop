@@ -1,0 +1,89 @@
+---
+title: "ENVS-193DS Week 7 Coding Workshop"
+author: "Jesse Grigolite"
+date: "2023-05-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Set Up
+```{r, libraries}
+library(tidyverse)
+library(here)
+library(lterdatasampler)
+
+library(performance)
+
+library(broom)
+
+library(flextable)
+
+library(ggeffects)
+
+library(car)
+library(naniar)
+```
+
+## Linear Models
+
+How does stem length _predict_ stem drying mass?:
+
+```{r, filtering-data}
+maples_data <- hbr_maples %>% 
+  filter(year == 2003 & watershed == "Reference")
+```
+
+Visualizing missing data:
+
+```{r, missing-data-vis}
+gg_miss_var(maples_data)
+
+```
+
+
+Create exploratory visualization:
+
+```{r, explore-data-vis}
+ggplot(data = maples_data, aes(x = stem_length, y = stem_dry_mass)) +
+  geom_point()
+```
+
+
+Let's try a model:
+
+```{r, linear-model-maples}
+#first identify y-axis, outcome,  and then predictor, x-axis
+maples_model <- lm(stem_dry_mass ~ stem_length, data = maples_data)
+
+maples_model
+```
+
+Check our assumptions:
+
+1.) linear relationship between variables: yes! used the exploratory data visualization to check
+2.) independence of errors: yes! (making assumption based on how data was collected)
+3.) homoskedasticity of errors: yes! (making that decision from residuals vs. fitted plot/scale vs location plots)
+4.) normally distributed errors: yes! (looking at QQ plot of residuals)
+
+```{r, checking-assumptions}
+#use plot function in console and put in your linear model to see all four plots to check assumptions
+#looking at residuals plot, look homoscedastic, residuals evenly distributed
+#now look at qq plot to check for normally distributed residuals, look normally distributed, follow linear path
+#scale location shows same thing as first but sqrt
+#look at cooks distance to check for out liars, does not look like there are out liars
+#OR to display all four in the same grid, use par to set graphing parameter
+par(mfrow = c(2, 2))
+plot(maples_model)
+
+
+```
+
+turn off the 2 by 2 grid
+
+```{r, turning-off-the-grid, results= FALSE}
+dev.off()
+```
+
